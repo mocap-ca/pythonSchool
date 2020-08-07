@@ -5,22 +5,30 @@ from PySide2 import QtWidgets
 class MyDialog(QtWidgets.QDialog):
     def __init__(self, parent=None):
         super(MyDialog, self).__init__(parent)
-        layout = QtWidgets.QHBoxLayout()
+        layout = QtWidgets.QVBoxLayout()
         self.label1 = QtWidgets.QLabel("Hello Label 1")
-        self.label2 = QtWidgets.QLabel("Hello Label 2")
-        self.label3 = QtWidgets.QLabel("Hello Label 3")
+        self.button_one = QtWidgets.QPushButton("Press Me!")
+        self.button_one.pressed.connect(self.button_pressed)
+        self.line_edit = QtWidgets.QLineEdit("Text Goes Here", self)
+        self.line_edit.textChanged.connect(self.text_has_changed)
         layout.addWidget(self.label1)
-        layout.addWidget(self.label2)
-        layout.addWidget(self.label3)
+        layout.addWidget(self.button_one)
+        layout.addWidget(self.line_edit)
+        layout.addStretch()
         self.setLayout(layout)
-        self.resize(400, 400)
+        self.resize(300, 150)
+
+    def button_pressed(self):
+        print("HERE!")
+
+    def text_has_changed(self, value):
+        self.label1.setText("Text is: " + value)
 
 
 def show_dialog():
     app = QtWidgets.QApplication(sys.argv)
     d = MyDialog()
-    d.label1.setText("HELLO!!!")
-    print(d.label1.text())
+    print(d.button_one)
     d.exec_()  # blocking call
 
 
