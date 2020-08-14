@@ -1,0 +1,18 @@
+import sys
+
+# change this path to your location of the pythonSchool git repo
+sys.path.append("/Users/alastairmacleod/git/github/pythonSchool")
+
+from maya import OpenMayaUI as omui
+from shiboken2 import wrapInstance
+from class2 import mayaGui
+from PySide2 import QtWidgets
+
+reload(mayaGui)
+
+ptr = omui.MQtUtil.mainWindow()
+widget = wrapInstance(long(ptr), QtWidgets.QWidget)
+
+
+d = mayaGui.MyDialog(widget)
+d.exec_()
