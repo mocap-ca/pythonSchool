@@ -1,4 +1,6 @@
-import sys
+from maya import OpenMayaUI as omui
+from shiboken2 import wrapInstance
+
 try:
   from PySide2 import QtWidgets, QtCore
 except ImportError:
@@ -7,8 +9,14 @@ except ImportError:
 import maya.cmds as m
 import os
 
+
 class MyDialog(QtWidgets.QDialog):
     def __init__(self, parent=None):
+
+        if not parent:
+            ptr = omui.MQtUtil.mainWindow()
+            parent = wrapInstance(long(ptr), QtWidgets.QWidget)
+
         super(MyDialog, self).__init__(parent)
 
         self.status = None
@@ -77,6 +85,15 @@ class MyDialog(QtWidgets.QDialog):
         print(item.data(QtCore.Qt.UserRole +1))
 
 
+
+INSTANCE = None
+def show_gui():
+    """ Singleton to create to create the gui if it doesn't exist, or show if it does """
+    global INSTANCE
+    if not INSTANCE:
+        INSTANCE = MyDialog()
+    INSTANCE.show()
+    return INSTANCE
 
 
 def blah():
