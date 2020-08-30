@@ -1,3 +1,5 @@
+from functools import partial
+
 
 def val(a):
     return int(a)
@@ -12,4 +14,5 @@ for i in sorted(a, key=lambda v: int(v)):
 
 
 print(lambda v: int(v))
+
 
