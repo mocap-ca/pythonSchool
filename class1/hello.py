@@ -11,11 +11,12 @@ def function(a):
         print("A is One")
     if a is 2:
         print("A is Two")
+    if a is 3:
+        print("A is Three")
     if a is 4:
         print("A is Four")
 
 
-
 if __name__ == "__main__":
-    function(2)
+    function(3)
 
