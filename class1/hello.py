@@ -7,6 +7,8 @@ Feel free to ask questions or post in the discord general channel.
 """
 
 def function(a):
+    if a is 0:
+        print("A is Zero")
     if a is 1:
         print("A is One")
     if a is 2:
