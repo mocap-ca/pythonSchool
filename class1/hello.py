@@ -11,6 +11,8 @@ def function(a):
         print("A is One")
     if a is 2:
         print("A is Two")
+    if a is 4:
+        print("A is Four")
 
 
 
