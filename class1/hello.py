@@ -21,6 +21,8 @@ def function(a):
         print("A is Five")
     if a is 6:
         print("A is Six")
+    if a is 7:
+        print("A is Seven")
 
 
 if __name__ == "__main__":
