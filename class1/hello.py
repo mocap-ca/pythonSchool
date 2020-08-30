@@ -6,14 +6,14 @@ Feel free to ask questions or post in the discord general channel.
 
 """
 
-def function(arg):
-    a = 1
-    b = "value"
+def function(a):
     if a is 1:
         print("A is One")
+    if a is 2:
+        print("A is Two")
 
 
 
 if __name__ == "__main__":
-    function(None)
+    function(2)
 
