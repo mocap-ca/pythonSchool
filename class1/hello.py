@@ -17,6 +17,8 @@ def function(a):
         print("A is Three")
     if a is 4:
         print("A is Four")
+    if a is 5:
+        print("A is Five")
 
 
 if __name__ == "__main__":
