@@ -40,7 +40,7 @@ class HangmanDialog(QtWidgets.QDialog):
         self.initialize_result_page()
         self.initialize_completed = True
 
-        if self.database_error == False:
+        if not self.database_error:
             self.setup_welcome_page()
         else:
             self.setup_result_page()
@@ -91,7 +91,7 @@ class HangmanDialog(QtWidgets.QDialog):
         self.image_path = ""
         self.questions_list = []
 
-        if os.path.isfile(self.directory_path) is False or os.access(self.directory_path, os.R_OK) is False:
+        if not os.path.isfile(self.directory_path) or not os.access(self.directory_path, os.R_OK) :
             self.database_error = True
             print("Error: Directory not found or not readable")
             return
@@ -113,12 +113,11 @@ class HangmanDialog(QtWidgets.QDialog):
         self.question = self.questions_list[0]
         self.question_object = QuestionTemplate.QuestionClass(self.question)
         for index, button in enumerate(self.question_object.alphabet_button_list):
-            self.question_object.alphabet_button_list[index].clicked.connect(partial(self.examine_guessed_alphabet,
-                                                                                     button))
+            self.question_object.alphabet_button_list[index].clicked.connect(
+                partial(self.examine_guessed_alphabet, button))
 
     def setup_question_page(self):
         """Basic setting up of the Question page."""
-
         # While setting up signal-slot connection in welcome page initialization, no need to setup questions page.
         if self.initialize_completed == False:
             return
@@ -167,8 +166,8 @@ class HangmanDialog(QtWidgets.QDialog):
         for pos, char in enumerate(self.question):
             if self.question_object.alphabet_list[self.index_of_clicked_button].upper() != char.upper():
                 continue
-            self.question_object.answer_letters_list[pos].setText(self.question_object.alphabet_list[
-                                                                      self.index_of_clicked_button].upper())
+            self.question_object.answer_letters_list[pos].setText(
+                self.question_object.alphabet_list[self.index_of_clicked_button].upper())
             self.correct_guess_count += 1
             if self.correct_guess_count != len(self.question) - self.question.count(" "):
                 continue
@@ -198,8 +197,8 @@ class HangmanDialog(QtWidgets.QDialog):
         self.correct_guess_count = 0
         self.initialize_next_question_page()
         for index, button in enumerate(self.question_object.alphabet_button_list):
-            self.question_object.alphabet_button_list[index].clicked.connect(partial(self.examine_guessed_alphabet,
-                                                                                     button))
+            self.question_object.alphabet_button_list[index].clicked.connect(
+                partial(self.examine_guessed_alphabet, button))
         self.setup_clue_image()
 
     def initialize_result_page(self):

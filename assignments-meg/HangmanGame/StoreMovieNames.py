@@ -7,6 +7,6 @@ movies = {'Hulk': 'Hulk.jpg',
           'Toy Story': 'ToyStory.jpg'}
 try:
     with open('Database/MoviesDatabase.json', 'w') as data_file:
-        json.dump(movies, data_file)
+        json.dump(movies, data_file, indent=2)
 except ValueError as write_error:
     print("Database could not be created.\n", write_error)
