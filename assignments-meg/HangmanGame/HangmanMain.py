@@ -163,11 +163,12 @@ class HangmanDialog(QtWidgets.QDialog):
         Each time the alphabet is found, increments correct_guess_count.
         Once the entire movie name has been guessed correctly, goes to next question.
         If questions list is exhausted, proceeds to result page."""
+	button = self.index_of_clicked_button
         for pos, char in enumerate(self.question):
-            if self.question_object.alphabet_list[self.index_of_clicked_button].upper() != char.upper():
+            if self.question_object.alphabet_list[button].upper() != char.upper():
                 continue
             self.question_object.answer_letters_list[pos].setText(
-                self.question_object.alphabet_list[self.index_of_clicked_button].upper())
+                self.question_object.alphabet_list[button].upper())
             self.correct_guess_count += 1
             if self.correct_guess_count != len(self.question) - self.question.count(" "):
                 continue
