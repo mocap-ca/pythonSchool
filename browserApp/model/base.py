@@ -25,3 +25,4 @@ class BaseItem(object):
     def get_info(self):
         """ returns a dict of information about the item """
         return NotImplementedError
+
