@@ -23,7 +23,7 @@ class ImportWin(QtWidgets.QDialog):
         self.layout = QtWidgets.QHBoxLayout()
 
         '''Create event for widgets when clicked'''
-        self.browse_button.clicked.connect(self.browse_path)
+        self.browse_button.clicked.connect(self.open_dir)
 
         '''Adding widgets and setting the layout'''
         self.layout.addWidget(self.dir_path)
@@ -31,10 +31,12 @@ class ImportWin(QtWidgets.QDialog):
         #self.layout.addWidget(self.import_button)
         self.setLayout(self.layout)
 
-    def browse_path(self):
-        '''When browse button is pushed, select directory path to browse
-        Once path is selected and set, FBX items only will be listed'''
-        print("Hello!")
+    def open_dir(self):
+        '''When browse button is pushed, select directory path to browse. Dir path will be set
+        in QLineEdit field'''
+        dir = QtWidgets.QFileDialog.getExistingDirectory(self,"Find Directory..." )
+        correct_path = self.dir_path.setText(dir)
+        return correct_path #how to return the dir path name??
 
 
 
