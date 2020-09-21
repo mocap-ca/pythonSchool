@@ -3,7 +3,7 @@ Class sorts the list of objects into categories based on the types of the object
 """
 import os
 import pymel.core as pm
-
+import pprint
 
 class CategorizeObjects:
     def __init__(self):
@@ -11,7 +11,7 @@ class CategorizeObjects:
         self.shape_objects_list = []
         self.objects_dictionary = {}
 
-    def create_lists(self):
+    def create_object_containers(self):
         """Calls the methods that create:
         1. A list of Shape objects.
         2. A dictionary with object names as values, and their types as keys."""
@@ -40,6 +40,5 @@ class CategorizeObjects:
             if object_type not in self.objects_dictionary:  # if category is not already a key in the dictionary, add it
                 self.objects_dictionary[object_type] = []
             self.objects_dictionary[object_type].append(selected_object)  # add the object to the dictionary
-
 
 
