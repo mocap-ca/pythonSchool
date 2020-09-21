@@ -30,7 +30,8 @@ def validate_desired_names(desired_names_list):
 
 def suggest_name(object_name, category_name):
     """ Adds an appropriate suffix to the object name (if there isn't one already), and returns it as the
-    suggested name. Eg: The suffix '_geo' is added to a mesh object.
+    suggested name. Eg: The suffix '_geo' is added to a mesh object. If database is not accessible, prints an error and
+    returns the name without a suffix
     :param object_name : Name of the object that needs renaming
     :type object_name : String
     :param category_name : Type of the object. Eg: mesh, joint, locator.
@@ -40,13 +41,16 @@ def suggest_name(object_name, category_name):
     :rtype object_name : String """
 
     suffix = "_" + category_name.lower()[:3]
-    directory_path = "Database\SuffixDatabase.json"
-    suffix_dict = None
 
-    if not os.path.isfile(directory_path) or not os.access(directory_path, os.R_OK):  # case: data loading failed.
+    project_path = os.path.dirname(os.path.abspath(__file__))
+    database_path = os.path.join(project_path, 'Database\SuffixDatabase.json')
+
+    suffix_dict = None
+    object_name = str(object_name)
+    if not os.path.isfile(database_path) or not os.access(database_path, os.R_OK):  # case: data loading failed.
         print("Error: Directory not found or not readable")
         return object_name
-    database_file = open(directory_path)
+    database_file = open(database_path)
 
     try:  # case: data loading successful.
         suffix_dict = json.load(database_file)

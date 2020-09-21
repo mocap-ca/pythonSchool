@@ -50,24 +50,10 @@ class RenamerDialog(QtWidgets.QDialog):
         self.row_index = 0
         self.new_name_dictionary = {}
         self.desired_names_list = []
+        self.initialize_ui_elements()
 
         self.populate_window()
 
-
-    def populate_window(self):
-        """ Calls the methods that create and display the UI widgets in the popup window"""
-        self.initialize_ui_elements()
-
-        # add heading labels to the top of the window
-        self.setup_heading_labels()
-
-        # create two lists (one for current object names, one for the desired new names) and add them to the display.
-        self.categorize_object.objects_list = self.all_selected_objects
-        self.categorize_object.create_object_containers()
-        self.setup_scroll_area_widget()
-
-        # create a rename button, and add it to the bottom of the display
-        self.setup_rename_button()
 
     def initialize_ui_elements(self):
         """Creates all the UI elements for the dialog window, except the dynamically created ones."""
@@ -82,6 +68,20 @@ class RenamerDialog(QtWidgets.QDialog):
         self.error_label = QtWidgets.QLabel()
 
         self.rename_button = QtWidgets.QPushButton("Rename and close")
+
+    def populate_window(self):
+        """ Calls the methods that create and display the UI widgets in the popup window"""
+
+        # add heading labels to the top of the window
+        self.setup_heading_labels()
+
+        # create two lists (one for current object names, one for the desired new names) and add them to the display.
+        self.categorize_object.objects_list = self.all_selected_objects
+        self.categorize_object.create_object_containers()
+        self.setup_scroll_area_widget()
+
+        # create a rename button, and add it to the bottom of the display
+        self.setup_rename_button()
 
 
     def setup_heading_labels(self):
