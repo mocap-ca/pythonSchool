@@ -6,12 +6,13 @@ import os
 
 
 def filetest():
-    path = "/Volumes/Orange/GGhost"
+    path = "C:/Users/musht/Documents/maya/projects/mocap_data/Longbow Locomotion Pack"
 
     for i in os.listdir(path):
         full_path = os.path.join(path, i)
         item = bmf.FileItem(full_path)
-        print("% 6d %s    %s" % (item.children(), item.short_name(), str(item.get_icon())))
+        print("% 6d %s    %s" % (item.children(), item.get_info(), str(item.get_icon())))
+
 
 
 def stubtest():
@@ -21,5 +22,6 @@ def stubtest():
 
 
 if __name__ == "__main__":
-   stubtest()
+   #stubtest()
    filetest()
+
