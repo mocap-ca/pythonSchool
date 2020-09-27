@@ -9,14 +9,28 @@ class InfoView(QtWidgets.QWidget):
 
         layout = QtWidgets.QHBoxLayout()
 
+        self.table = QtWidgets.QTreeWidget()
+        self.table.setColumnCount(2)
+
         layout.addSpacing(1)
-        layout.addWidget(QtWidgets.QLabel("info goes here"))
+        layout.addWidget(self.table)
         layout.addSpacing(1)
+
 
         self.setLayout(layout)
 
     def populate(self, data):
         print("Do something useful with: " + str(data))
+
+        # Clear the table
+        self.table.clear()
+
+        # Update the table with name : value from the get_info() dict
+        meta = data.get_info()
+        for k, v in meta.items():
+            item = QtWidgets.QTreeWidgetItem([k,v])
+            self.table.addTopLevelItem(item)
+
 
 
 
