@@ -46,7 +46,7 @@ class FileItem(BaseItem):
         if os.path.isfile(self.full_path):
             stat = os.stat(self.full_path)
             data['type'] = "File"
-            data['file_size'] = str(stat.st_size)
+            data['file_size'] = stat.st_size
             data['created'] = str(stat.st_ctime)
 
         if os.path.isdir(self.full_path):
