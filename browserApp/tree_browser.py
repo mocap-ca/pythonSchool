@@ -1,13 +1,23 @@
 """ This is a file browser that uses a FileItem object to show a tree of files """
 
-from PyQt5 import QtWidgets, QtCore, QtGui
+try:
+    from PySide2 import QtWidgets, QtCore, QtGui
+    create_signal = QtCore.Signal
+except:
+    from PyQt5 import QtWidgets, QtCore, QtGui
+    create_signal = QtCore.pyqtSignal
+
+from browserApp.model import base
 
 
 class TreeBrowser(QtWidgets.QTreeWidget):
 
+    app_item_selected = create_signal(base.BaseItem)
+
     def __init__(self, parent=None):
         super(TreeBrowser, self).__init__(parent)
         self.itemExpanded.connect(self.on_item_expanded)
+        self.itemClicked.connect(self.on_item_clicked)
 
     def populate(self, top_item):
         self.clear()
@@ -30,6 +40,10 @@ class TreeBrowser(QtWidgets.QTreeWidget):
         for i in range(item.childCount()):
             child = item.child(i)
             self.add_children(child)
+
+    def on_item_clicked(self, item):
+        model_item = item.data(0, QtCore.Qt.UserRole)
+        self.app_item_selected.emit(model_item)
 
     def add_children(self, widget_item):
         item = widget_item.data(0, QtCore.Qt.UserRole)

@@ -4,6 +4,7 @@ from PyQt5 import QtWidgets, QtCore
 import sys
 
 from browserApp import info_view, tree_browser
+from browserApp.model import file as model_file
 
 
 class App(QtWidgets.QMainWindow):
@@ -22,7 +23,7 @@ class App(QtWidgets.QMainWindow):
         layout = QtWidgets.QHBoxLayout()
 
         self.tree = tree_browser.TreeBrowser()
-        self.tree.itemClicked.connect(self.itemSelected)
+        self.tree.app_item_selected.connect(self.itemSelected)
 
         layout.addWidget(self.tree)
 
@@ -38,9 +39,8 @@ class App(QtWidgets.QMainWindow):
         self.show()
 
 
-    def itemSelected(self, item, col):
+    def itemSelected(self, model_info):
         """ User as clicked on an item in the tree, pass item's data to the info view """
-        model_info = item.data(0, QtCore.Qt.UserRole).get_info()
         self.info.populate(model_info)
 
 
@@ -53,4 +53,6 @@ def show_app(top_item):
 
 
 if __name__ == "__main__":
-    show_app()
+    top_item = model_file.FileItem("/Volumes/T7/GhostKid")
+
+    show_app(top_item)
