@@ -3,7 +3,7 @@
 from PyQt5 import QtWidgets, QtCore
 import sys
 
-from browserApp import info_view, tree_browser
+from browserApp import info_view, tree_browser, collection_view
 from browserApp.model import file as model_file
 
 
@@ -22,11 +22,16 @@ class App(QtWidgets.QMainWindow):
 
         layout = QtWidgets.QHBoxLayout()
 
+        # Tree View (on left)
         self.tree = tree_browser.TreeBrowser()
         self.tree.app_item_selected.connect(self.itemSelected)
-
         layout.addWidget(self.tree)
 
+        # Collection view (in middle)
+        self.collection = collection_view.CollectionView()
+        layout.addWidget(self.collection)
+
+        # Info view (on right)
         self.info = info_view.InfoView()
         layout.addWidget(self.info)
 
@@ -42,6 +47,7 @@ class App(QtWidgets.QMainWindow):
     def itemSelected(self, model_info):
         """ User as clicked on an item in the tree, pass item's data to the info view """
         self.info.populate(model_info)
+        self.collection.populate(model_info)
 
 
 
