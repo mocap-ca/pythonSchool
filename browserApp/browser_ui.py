@@ -7,11 +7,14 @@ import os
 import pprint
 import time
 
-from PySide2 import QtWidgets, QtCore, QtGui
+try:
+    from PySide2 import QtWidgets, QtCore, QtGui
+except:
+    from PyQt5 import QtWidgets, QtCore, QtGui
 
 
 class BrowserDialog(QtWidgets.QDialog):
-    def __init__(self, parent=None):
+    def __init__(self, folder_path, parent=None):
         """
 
         """
@@ -20,8 +23,9 @@ class BrowserDialog(QtWidgets.QDialog):
         self.setWindowTitle("File Browser 1.0 © CollabMLM 2020")
         self.setGeometry(600, 300, 700, 400)
 
+        self.folder_path = folder_path
+
         # Data
-        self.add_dummy_data()
         self.list_of_file_details = []
 
         # Dialog layout
@@ -65,14 +69,15 @@ class BrowserDialog(QtWidgets.QDialog):
 
         self.setup_style()
 
+        self.populate()
+
     def setup_style(self):
         self.right_widget.setMaximumWidth(200)
         self.icons_button.setMaximumWidth(70)
         self.list_button.setMaximumWidth(70)
         self.icon_list_buttons_bar_layout.setAlignment(QtCore.Qt.AlignLeft)
 
-    def add_dummy_data(self):
-        self.folder_path = "D:/Programming/AlsPythonSchool/assignment2/meg"
+    def populate(self):
         self.list_of_file_detail_dictionaries = []
         for file in os.listdir(self.folder_path):
             full_path = os.path.join(self.folder_path, file)
@@ -116,9 +121,8 @@ class BrowserDialog(QtWidgets.QDialog):
 
 
 
-
-
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
-    browser_dialog = BrowserDialog()
+    folder_path = "/Volumes/T7/GhostKid"
+    browser_dialog = BrowserDialog(folder_path)
     browser_dialog.exec_()
