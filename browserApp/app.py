@@ -1,14 +1,21 @@
-""" This is the main application that implments everything in an abstract way """
+""" This is the main application that implements everything in an abstract way """
 
-from PyQt5 import QtWidgets, QtCore
+try:
+    from PySide2 import QtWidgets, QtCore
+    create_signal = QtCore.Signal
+except:
+    from PyQt5 import QtWidgets, QtCore
+    create_signal = QtCore.pyqtSignal
+
 import sys
 
-from browserApp import info_view, tree_browser
+from browserApp import info_view, tree_browser, collection_view
+from browserApp.model import file as model_file
 
 
 class App(QtWidgets.QMainWindow):
 
-    """ This is the base application, which should work with any kind of model data """
+    """ This is the foo application, which should work with any kind of model data """
 
     def __init__(self, top_item, parent=None):
         super(App, self).__init__(parent)
@@ -21,11 +28,16 @@ class App(QtWidgets.QMainWindow):
 
         layout = QtWidgets.QHBoxLayout()
 
+        # Tree View (on left)
         self.tree = tree_browser.TreeBrowser()
-        self.tree.itemClicked.connect(self.itemSelected)
-
+        self.tree.app_item_selected.connect(self.itemSelected)
         layout.addWidget(self.tree)
 
+        # Collection view (in middle)
+        self.collection = collection_view.CollectionView()
+        layout.addWidget(self.collection)
+
+        # Info view (on right)
         self.info = info_view.InfoView()
         layout.addWidget(self.info)
 
@@ -38,10 +50,10 @@ class App(QtWidgets.QMainWindow):
         self.show()
 
 
-    def itemSelected(self, item, col):
+    def itemSelected(self, model_info):
         """ User as clicked on an item in the tree, pass item's data to the info view """
-        model_info = item.data(0, QtCore.Qt.UserRole).get_info()
         self.info.populate(model_info)
+        self.collection.populate(model_info)
 
 
 
@@ -53,4 +65,6 @@ def show_app(top_item):
 
 
 if __name__ == "__main__":
-    show_app()
+    top_item = model_file.FileItem("/Volumes/T7/GhostKid")
+
+    show_app(top_item)
