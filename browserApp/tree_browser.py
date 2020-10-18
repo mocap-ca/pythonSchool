@@ -19,6 +19,19 @@ class TreeBrowser(QtWidgets.QTreeWidget):
         self.itemExpanded.connect(self.on_item_expanded)
         self.itemClicked.connect(self.on_item_clicked)
 
+        self.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.customContextMenuRequested.connect(self.show_menu)
+
+    def show_menu(self, p):
+
+        menu = QtWidgets.QMenu(self)
+        action = menu.addAction("TEST")
+        action.triggered.connect(self.do_this)
+        menu.popup(self.mapToGlobal(p))
+
+    def do_this(self):
+        print("I'll get right on that!!!")
+
     def populate(self, top_item):
         self.clear()
         self.top_item = top_item
