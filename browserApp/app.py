@@ -1,11 +1,16 @@
 """ This is the main application that implments everything in an abstract way """
 
-from PyQt5 import QtWidgets, QtCore
+try:
+    from PySide2 import QtWidgets, QtCore, QtGui
+except:
+    from PyQt5 import QtWidgets, QtCore, QtGui
+
 import sys
 
-from browserApp import info_view, tree_browser, collection_view
-from browserApp.model import file as model_file
-
+# from browserApp import info_view, tree_browser, collection_view
+# from browserApp.model import file as model_file
+import info_view, tree_browser, collection_view
+from model import file as model_file
 
 class App(QtWidgets.QMainWindow):
 
@@ -43,13 +48,10 @@ class App(QtWidgets.QMainWindow):
 
         self.show()
 
-
     def itemSelected(self, model_info):
         """ User as clicked on an item in the tree, pass item's data to the info view """
         self.info.populate(model_info)
         self.collection.populate(model_info)
-
-
 
 
 def show_app(top_item):
@@ -59,6 +61,7 @@ def show_app(top_item):
 
 
 if __name__ == "__main__":
-    top_item = model_file.FileItem("/Volumes/T7/GhostKid")
+    # top_item = model_file.FileItem("/Volumes/T7/GhostKid")
+    top_item = model_file.FileItem("D:\Programming\AlsSchool_Backup\class_3")
 
     show_app(top_item)

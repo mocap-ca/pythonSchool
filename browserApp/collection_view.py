@@ -1,6 +1,9 @@
 """ This will show detailed information about an item """
 
-from PyQt5 import QtWidgets
+try:
+    from PySide2 import QtWidgets, QtCore, QtGui
+except:
+    from PyQt5 import QtWidgets, QtCore, QtGui
 
 
 class CollectionView(QtWidgets.QWidget):
@@ -35,28 +38,28 @@ class CollectionView(QtWidgets.QWidget):
 
         self.label.setText("Total Size: %d" % file_size)
 
-        # keys = set()
-        #
-        # integer_values = {}
-        #
-        # for i in range(child_count):
-        #     subitem = items.get_child(i)
-        #     meta = subitem.get_info()
-        #     keys.update(meta.keys())
-        #
-        # for i in range(child_count):
-        #     subitem = items.get_child(i)
-        #     meta = subitem.get_info()
-        #
-        #     for key in keys:
-        #         value = meta[key]
-        #         if isinstance(value, int):
-        #             if key not in integer_values:
-        #                 integer_values[key] = 0
-        #             integer_values[key] += value
-        #
-        #
-        # print(integer_values)
+        keys = set()
+
+        integer_values = {}
+
+        for i in range(child_count):
+            subitem = items.get_child(i)
+            meta = subitem.get_info()
+            keys.update(meta.keys())
+
+        for i in range(child_count):
+            subitem = items.get_child(i)
+            meta = subitem.get_info()
+
+            for key in keys:
+                value = meta[key]
+                if isinstance(value, int):
+                    if key not in integer_values:
+                        integer_values[key] = 0
+                    integer_values[key] += value
+
+
+        print(integer_values)
 
 
 

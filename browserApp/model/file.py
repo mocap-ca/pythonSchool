@@ -1,4 +1,5 @@
-from browserApp.model.base import BaseItem
+# from browserApp.model.base import BaseItem
+from model.base import BaseItem
 import os
 
 

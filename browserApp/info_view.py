@@ -1,35 +1,152 @@
 """ This will show detailed information about an item """
 
-from PyQt5 import QtWidgets
+try:
+    from PySide2 import QtWidgets, QtCore, QtGui
+except:
+    from PyQt5 import QtWidgets, QtCore, QtGui
 
+from os import listdir, open, O_RDWR
+from os.path import isfile, join
+from functools import partial
 
 class InfoView(QtWidgets.QWidget):
     def __init__(self, parent=None):
         super(InfoView, self).__init__(parent)
 
-        layout = QtWidgets.QHBoxLayout()
+        layout = QtWidgets.QVBoxLayout()
 
-        self.table = QtWidgets.QTreeWidget()
-        self.table.setColumnCount(2)
+        self.icons_widget = QtWidgets.QWidget()
+        self.icons_layout = QtWidgets.QGridLayout()
+
+        self.list_table = QtWidgets.QWidget()
+        self.list_layout = QtWidgets.QGridLayout()
+        self.list_table.setLayout(self.list_layout)
+        self.list_layout.setAlignment(QtCore.Qt.AlignTop)
+        self.file_name_header = QtWidgets.QLabel("File:")
+        self.size_header = QtWidgets.QLabel("Size:")
+        self.type_header = QtWidgets.QLabel("Type:")
+        self.created_header = QtWidgets.QLabel("Created:")
+        self.list_layout.addWidget(self.file_name_header, 0, 0)
+        self.list_layout.addWidget(self.size_header, 0, 1)
+        self.list_layout.addWidget(self.type_header, 0, 2)
+        self.list_layout.addWidget(self.created_header, 0, 3)
+
+        self.list_view_button = QtWidgets.QPushButton("List View")
+        self.icons_view_button = QtWidgets.QPushButton("Icon View")
+        self.top_bar_layout = QtWidgets.QHBoxLayout()
+        self.top_bar_layout.addWidget(self.list_view_button)
+        self.top_bar_layout.addWidget(self.icons_view_button)
+
+        self.list_view_button.clicked.connect(self.setup_list_view)
+        self.icons_view_button.clicked.connect(self.setup_icons_view)
+
+        self.stacked_pages = QtWidgets.QStackedWidget()
+        self.stacked_pages.addWidget(self.list_table)
+        self.stacked_pages.addWidget(self.icons_widget)
+
+        self.stacked_pages.setCurrentWidget(self.list_table)
 
         layout.addSpacing(1)
-        layout.addWidget(self.table)
+        layout.addLayout(self.top_bar_layout)
+        layout.addWidget(self.stacked_pages)
         layout.addSpacing(1)
 
+        self.column_index = 0
+        self.row_index = 0
 
         self.setLayout(layout)
 
     def populate(self, data):
-        print("Do something useful with: " + str(data))
+        # print("Do something useful with: " + str(data))
 
-        # Clear the table
-        self.table.clear()
+        # Clear the list_table
+        self.clear_layout(self.list_layout)
+        self.stacked_pages.setCurrentWidget(self.list_table)
 
-        # Update the table with name : value from the get_info() dict
+        # If item clicked on is a file, display info in list_table. Else, display buttons with file names.
         meta = data.get_info()
-        for k, v in meta.items():
-            item = QtWidgets.QTreeWidgetItem([k,v])
-            self.table.addTopLevelItem(item)
+        if 'type' in meta:
+            # File:
+            if meta['type'] == 'File':
+                pass
+                # for k, v in meta.items():
+                #     item = QtWidgets.QTreeWidgetItem([k, v])
+                #     self.details_list_table.addTopLevelItem(item)
+
+            # Directory:
+            elif meta['type'] == 'Dir':
+                self.stacked_pages.setCurrentWidget(self.icons_widget)
+                self.icons_widget.setLayout(self.icons_layout)
+
+                self.clear_layout(self.icons_layout)
+                self.icons_layout.setAlignment(QtCore.Qt.AlignTop)
+
+                # Request addition of 'file_name' to data model
+                if 'full_path' in meta:
+                    dir_path = meta['full_path']
+                    files = [f for f in listdir(dir_path) if isfile(join(dir_path, f))]
+                    buttons_list = []
+                    print(files)
+
+                    for file in files:
+                        file_name = file.split('.')[0]
+                        exec("%s_button = QtWidgets.QPushButton('%s')" % (file_name, file_name))
+                        exec("buttons_list.append(%s_button)" % file_name)
+
+                        self.icons_layout.addWidget(buttons_list[-1], self.row_index, self.column_index)
+                        self.update_grid_positions()
+                        self.set_button_style(buttons_list[-1])
+
+                        # signal-slot connection for file buttons:
+                        buttons_list[-1].clicked.connect(partial(self.on_item_clicked, dir_path + "\\" + file))
+
+                    # file_name = os.path.basename(meta['full_path'])
+
+    def on_item_clicked(self, file):   # request to add the parameter in stub
+        print(file)
+        open(file, O_RDWR)
+
+    def clear_layout(self, icons_layout):   # request to add the method in stub
+        # clear all buttons
+        while self.icons_layout.count():
+            child = self.icons_layout.takeAt(0)
+            if child.widget():
+                child.widget().deleteLater()
+        # file buttons
+        self.column_index = 0
+        self.row_index = 0
+
+    def update_grid_positions(self):
+        self.column_index += 1
+        if self.column_index == 3:  # go to next row
+            self.row_index += 1
+            self.column_index = 0
+
+    def set_button_style(self, button):
+        button.setFixedSize(100, 30)
+        # button.setStyleSheet("background-color : #FFF3F3")
+        button.setStyleSheet("border - width: 0px")
+        button.setStyleSheet("background : none")
+        # button.setAlignment(QtCore.Qt.AlignCenter)
+        button.setStyleSheet("QPushButton::hover"
+                             "{"
+                             "background-color : lightblue;"
+                             "}")
+
+    def setup_list_view(self):
+        self.stacked_pages.setCurrentWidget(self.list_table)
+
+    def setup_icons_view(self):
+        self.stacked_pages.setCurrentWidget(self.icons_widget)
+
+
+
+
+
+
+
+
+
 
 
 
