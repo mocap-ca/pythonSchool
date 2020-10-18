@@ -1,9 +1,11 @@
 """ This will show detailed information about an item """
 
 try:
-    from PySide2 import QtWidgets, QtCore, QtGui
+    from PySide2 import QtWidgets, QtCore
+    create_signal = QtCore.Signal
 except:
-    from PyQt5 import QtWidgets, QtCore, QtGui
+    from PyQt5 import QtWidgets, QtCore
+    create_signal = QtCore.pyqtSignal
 
 from os import listdir, open, O_RDWR
 from os.path import isfile, join
