@@ -1,6 +1,11 @@
 """ This will show detailed information about an item """
 
-from PyQt5 import QtWidgets
+try:
+    from PySide2 import QtWidgets, QtCore
+    create_signal = QtCore.Signal
+except:
+    from PyQt5 import QtWidgets, QtCore
+    create_signal = QtCore.pyqtSignal
 
 
 class InfoView(QtWidgets.QWidget):

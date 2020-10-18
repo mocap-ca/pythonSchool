@@ -22,6 +22,7 @@ class TreeBrowser(QtWidgets.QTreeWidget):
     def populate(self, top_item):
         self.clear()
         self.top_item = top_item
+        self.setHeaderHidden(True)
 
         if 'full_path' in self.top_item.get_info():
             self.setHeaderLabel(top_item.get_info()['full_path'])
