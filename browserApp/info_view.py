@@ -56,6 +56,8 @@ class InfoView(QtWidgets.QWidget):
         self.column_index = 0
         self.row_index = 0
 
+        self.buttons = {}
+
         self.setLayout(layout)
 
     def populate(self, data):
@@ -87,26 +89,27 @@ class InfoView(QtWidgets.QWidget):
                 if 'full_path' in meta:
                     dir_path = meta['full_path']
                     files = [f for f in listdir(dir_path) if isfile(join(dir_path, f))]
-                    buttons_list = []
+                    self.buttons.clear()
                     print(files)
 
                     for file in files:
                         file_name = file.split('.')[0]
-                        exec("%s_button = QtWidgets.QPushButton('%s')" % (file_name, file_name))
-                        exec("buttons_list.append(%s_button)" % file_name)
+                        button = QtWidgets.QPushButton(file_name)
+                        self.buttons[file_name] = button
 
-                        self.icons_layout.addWidget(buttons_list[-1], self.row_index, self.column_index)
+                        self.icons_layout.addWidget(button, self.row_index, self.column_index)
                         self.update_grid_positions()
-                        self.set_button_style(buttons_list[-1])
+                        self.set_button_style(button)
 
                         # signal-slot connection for file buttons:
-                        buttons_list[-1].clicked.connect(partial(self.on_item_clicked, dir_path + "\\" + file))
+                        button.clicked.connect(partial(self.on_item_clicked, dir_path + "\\" + file))
 
                     # file_name = os.path.basename(meta['full_path'])
 
     def on_item_clicked(self, file):   # request to add the parameter in stub
-        print(file)
-        open(file, O_RDWR)
+
+        print("Do something with: " + str(file))
+
 
     def clear_layout(self, icons_layout):   # request to add the method in stub
         # clear all buttons

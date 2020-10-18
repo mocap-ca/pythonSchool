@@ -63,7 +63,7 @@ def show_app(top_item):
 
 
 if __name__ == "__main__":
-    # top_item = model_file.FileItem("/Volumes/T7/GhostKid")
-    top_item = model_file.FileItem("D:\Programming\AlsSchool_Backup\class_3")
+    top_item = model_file.FileItem("/Volumes/T7/GhostKid")
+    #top_item = model_file.FileItem("D:\Programming\AlsSchool_Backup\class_3")
 
     show_app(top_item)
