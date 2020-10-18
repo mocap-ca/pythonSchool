@@ -9,6 +9,7 @@ except:
 
 import sys
 
+import os.path
 from browserApp import info_view, tree_browser, collection_view
 from browserApp.model import file as model_file
 
@@ -65,6 +66,16 @@ def show_app(top_item):
 
 
 if __name__ == "__main__":
-    top_item = model_file.FileItem("/Volumes/T7/GhostKid")
+
+    path = None
+    for f in ["/Volumes/T7/GhostKid"]:
+        if os.path.isdir(f):
+            path = f
+            break
+
+    if not path:
+        raise RuntimeError("Could not find a test path to work from")
+
+    top_item = model_file.FileItem(path)
 
     show_app(top_item)
