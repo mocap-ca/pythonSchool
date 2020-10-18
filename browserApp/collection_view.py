@@ -1,11 +1,9 @@
 """ This will show detailed information about an item """
 
 try:
-    from PySide2 import QtWidgets, QtCore, QtGui
-    create_signal = QtCore.Signal
+    from PySide2 import QtWidgets, QtCore
 except:
-    from PyQt5 import QtWidgets, QtCore, QtGui
-    create_signal = QtCore.pyqtSignal
+    from PyQt5 import QtWidgets, QtCore
 
 
 class CollectionView(QtWidgets.QWidget):

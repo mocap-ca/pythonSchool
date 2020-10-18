@@ -1,6 +1,12 @@
-""" This is the main application that implments everything in an abstract way """
+""" This is the main application that implements everything in an abstract way """
 
-from PyQt5 import QtWidgets, QtCore
+try:
+    from PySide2 import QtWidgets, QtCore
+    create_signal = QtCore.Signal
+except:
+    from PyQt5 import QtWidgets, QtCore
+    create_signal = QtCore.pyqtSignal
+
 import sys
 
 from browserApp import info_view, tree_browser, collection_view
