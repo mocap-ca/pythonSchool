@@ -9,7 +9,7 @@ from browserApp.model import file as model_file
 
 class App(QtWidgets.QMainWindow):
 
-    """ This is the base application, which should work with any kind of model data """
+    """ This is the BASE application, which should work with any kind of model data """
 
     def __init__(self, top_item, parent=None):
         super(App, self).__init__(parent)
