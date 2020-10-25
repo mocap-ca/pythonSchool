@@ -1,9 +1,11 @@
-""" This is the main application that implments everything in an abstract way """
+""" This is the main application that implements everything in an abstract way """
 
 try:
-    from PySide2 import QtWidgets, QtCore, QtGui
+    from PySide2 import QtWidgets, QtCore
+    create_signal = QtCore.Signal
 except:
-    from PyQt5 import QtWidgets, QtCore, QtGui
+    from PyQt5 import QtWidgets, QtCore
+    create_signal = QtCore.pyqtSignal
 
 import sys
 
@@ -14,7 +16,7 @@ from model import file as model_file
 
 class App(QtWidgets.QMainWindow):
 
-    """ This is the base application, which should work with any kind of model data """
+    """ This is the foo application, which should work with any kind of model data """
 
     def __init__(self, top_item, parent=None):
         super(App, self).__init__(parent)
@@ -61,7 +63,7 @@ def show_app(top_item):
 
 
 if __name__ == "__main__":
-    # top_item = model_file.FileItem("/Volumes/T7/GhostKid")
-    top_item = model_file.FileItem("D:\Programming\AlsSchool_Backup\class_3")
+    top_item = model_file.FileItem("/Volumes/T7/GhostKid")
+    #top_item = model_file.FileItem("D:\Programming\AlsSchool_Backup\class_3")
 
     show_app(top_item)

@@ -2,9 +2,11 @@
 import os
 
 try:
-    from PySide2 import QtWidgets, QtCore, QtGui
+    from PySide2 import QtWidgets, QtCore
+    create_signal = QtCore.Signal
 except:
-    from PyQt5 import QtWidgets, QtCore, QtGui
+    from PyQt5 import QtWidgets, QtCore
+    create_signal = QtCore.pyqtSignal
 
 from os import listdir, open, O_RDWR
 from os.path import isfile, join
@@ -60,6 +62,8 @@ class InfoView(QtWidgets.QWidget):
         self.column_index = 0
         self.row_index = 0
         self.data = {}
+        self.buttons = {}
+
         self.setLayout(layout)
 
     def populate(self, data):
@@ -129,6 +133,7 @@ class InfoView(QtWidgets.QWidget):
         # signal-slot connection for file buttons:
         button.clicked.connect(partial(self.on_item_clicked, path))
 
+
         file_info = QtCore.QFileInfo(path)
         icon_provider = QtWidgets.QFileIconProvider()
         icon = icon_provider.icon(file_info)
@@ -143,6 +148,7 @@ class InfoView(QtWidgets.QWidget):
         if " " in file:
             print("Cannot process file names with spaces, yet.")
             return
+
 
 
     def clear_layout(self, icons_layout):   # request to add the method in stub
