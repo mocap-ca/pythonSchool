@@ -91,7 +91,6 @@ class InfoView(QtWidgets.QWidget):
                 # Request addition of 'file_name' to data model
 
                 files = [f for f in listdir(item_path) if isfile(join(item_path, f))]
-                buttons_list = []
                 print(files)
 
                 for file in files:
