@@ -23,11 +23,12 @@ class CollectionView(QtWidgets.QWidget):
         self.setLayout(layout)
 
     def populate(self, items):
+        return
         #self.label.clear()
         for label in self.labels:
             label.clear()
             self.layout().removeWidget(label)
-        self.labels.clear()
+        # self.labels.clear()
 
         child_count = items.children()
         if child_count == 0:

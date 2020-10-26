@@ -1,5 +1,5 @@
 """ This will show detailed information about an item """
-import os
+import os, time
 
 try:
     from PySide2 import QtWidgets, QtCore
@@ -8,9 +8,10 @@ except:
     from PyQt5 import QtWidgets, QtCore
     create_signal = QtCore.pyqtSignal
 
-from os import listdir, open, O_RDWR
+from os import listdir
 from os.path import isfile, join
 from functools import partial
+
 
 class InfoView(QtWidgets.QWidget):
     def __init__(self, parent=None):
@@ -24,23 +25,10 @@ class InfoView(QtWidgets.QWidget):
         self.icons_layout = QtWidgets.QGridLayout()
         self.buttons_dict = {}
 
-        self.list_widget = QtWidgets.QWidget()
-        self.list_layout = QtWidgets.QGridLayout()
-        self.list_grid_column_index = 0
-        self.list_grid_row_index = 1
-        # self.list_widget.setLayout(self.list_layout)
-        self.list_layout.setAlignment(QtCore.Qt.AlignTop)
-        self.file_name_header = QtWidgets.QLabel("File:")
-        self.size_header = QtWidgets.QLabel("Size:")
-        self.type_header = QtWidgets.QLabel("Type:")
-        self.created_header = QtWidgets.QLabel("Created:")
-        self.list_layout.addWidget(self.file_name_header, 0, 0)
-        self.list_layout.addWidget(self.size_header, 0, 1)
-        self.list_layout.addWidget(self.type_header, 0, 2)
-        self.list_layout.addWidget(self.created_header, 0, 3)
+        self.details_widget = QtWidgets.QTableWidget()
 
-        self.list_view_button = QtWidgets.QPushButton("List View")
-        self.icons_view_button = QtWidgets.QPushButton("Icon View")
+        self.list_view_button = QtWidgets.QPushButton("Details View")
+        self.icons_view_button = QtWidgets.QPushButton("Icons View")
         self.top_bar_layout = QtWidgets.QHBoxLayout()
         self.top_bar_layout.addWidget(self.list_view_button)
         self.top_bar_layout.addWidget(self.icons_view_button)
@@ -49,7 +37,7 @@ class InfoView(QtWidgets.QWidget):
         self.icons_view_button.clicked.connect(self.setup_icons_view)
 
         self.stacked_pages = QtWidgets.QStackedWidget()
-        self.stacked_pages.addWidget(self.list_widget)
+        self.stacked_pages.addWidget(self.details_widget)
         self.stacked_pages.addWidget(self.icons_widget)
 
         self.stacked_pages.setCurrentWidget(self.icons_widget)
@@ -59,62 +47,67 @@ class InfoView(QtWidgets.QWidget):
         layout.addWidget(self.stacked_pages)
         layout.addSpacing(1)
 
-        self.column_index = 0
-        self.row_index = 0
+
+        self.details_header_list = ["Name", "Date", "Type", "Size"]
+        self.icons_column_index = 0
+        self.icons_row_index = 0
+        self.details_row_index = 0
+        self.details_column_index = 0
         self.data = {}
-        self.buttons = {}
+        self.icons_filename_buttons = {}
+        self.details_filename_buttons = {}
 
         self.setLayout(layout)
 
     def populate(self, data):
         self.data = data
 
-        # Clear the list_table
-        self.clear_layout(self.list_layout)
-
-        # If item clicked on is a file, display info in list_table. Else, display buttons with file names.
         meta = data.get_info()
-        self.list_grid_row_index += 1
+        print("Meta: ", meta)
         if 'full_path' in meta:
             item_path = meta['full_path']
-            print("full_path is : ", item_path)
         else:
             print("Could not find file path in dictionary")
             return
 
+        # Clear List View:
+        self.clear_details_widget(self.details_widget)
+
+        # Clear Icons View:
+        self.clear_icons_layout(self.icons_layout)
+
         if 'type' in meta:
             # File:
             if meta['type'] == 'File':          # If we remove files from the collection view, we can delete this check.
-                self.process_file(meta, item_path, item_path)
+                self.process_details_view(item_path, item_path)
+                self.process_icons_view(item_path, item_path)
+
+                self.clear_icons_layout(self.icons_layout)
+                self.icons_layout.setAlignment(QtCore.Qt.AlignTop)
 
             # Directory:
             elif meta['type'] == 'Dir':
-                self.clear_layout(self.icons_layout)
+
                 self.icons_layout.setAlignment(QtCore.Qt.AlignTop)
 
                 # Request addition of 'file_name' to data model
-
                 files = [f for f in listdir(item_path) if isfile(join(item_path, f))]
                 print(files)
-
+                self.reset_row_column_counts()
                 for file in files:
                     print("file: ", file)
-                    self.process_file(meta, file, item_path)
+                    self.process_details_view(file, item_path)
+                    self.process_icons_view(file, item_path)
         else:
             print("Could not find file type in dictionary")
 
-    def process_file(self, meta, file, file_path):
+    def reset_row_column_counts(self):
+        self.details_row_index = 0
+        self.details_column_index = 0
+        self.icons_column_index = 0
+        self.icons_row_index = 0
 
-        # LIST VIEW
-        self.list_widget.setLayout(self.list_layout)
-        self.list_grid_row_index += 1
-        if 'file_size' in meta:
-            file_size = meta['file_size']
-            size_label = QtWidgets.QLabel("0.0 MB")
-            self.list_grid_column_index = 1
-            self.list_layout.addWidget(size_label, 1, 1)
-
-        # ICON VIEW
+    def process_icons_view(self, file, file_path):
         self.icons_widget.setLayout(self.icons_layout)
         self.icons_layout.setSpacing(0)
         file_name = file.split('.')[0]
@@ -122,66 +115,120 @@ class InfoView(QtWidgets.QWidget):
 
         self.buttons_dict[file_name] = button
 
-        self.icons_layout.addWidget(button, self.row_index, self.column_index)
+        self.icons_layout.addWidget(button, self.icons_row_index, self.icons_column_index)
         self.update_grid_positions()
-        self.set_button_style(button, self.icon_image_path)
+        self.set_button_style(button)
 
         if "." not in file_path:
             path = file_path + "\\" + file
         else:
             path = file_path
-        # signal-slot connection for file buttons:
+        # signal-slot connection for file icons_filename_buttons:
         button.clicked.connect(partial(self.on_item_clicked, path))
 
+        self.add_icon_to_button(button, path)
 
+    def add_icon_to_button(self, button, path):
         file_info = QtCore.QFileInfo(path)
         icon_provider = QtWidgets.QFileIconProvider()
         icon = icon_provider.icon(file_info)
-
         button.setIcon(icon)
 
-    # file_name = os.path.basename(meta['full_path'])
-
-    def on_item_clicked(self, file):   # Does not work if there are any spaces in the file name
-        print(file)
-        os.system("start " + file)
-        if " " in file:
+    def on_item_clicked(self, file_path):   # Does not work if there are any spaces in the file name
+        print("Opening", file_path, "...")
+        if " " in file_path:
             print("Cannot process file names with spaces, yet.")
             return
+        os.system("start " + file_path)
 
+    def size_in_str(self, size_float):
+        if size_float < 1000:
+            return str(size_float) + " B"
+        elif size_float < 10 ** 6:
+            return str(size_float / (10 ** 3)) + " KB"
+        elif size_float < 10 ** 9:
+            return str(size_float/(10 ** 6)) + " MB"
+        else:
+            return str(size_float/(10 ** 9)) + " GB"
 
+    def clear_details_widget(self, table):
+        table.clearContents()
 
-    def clear_layout(self, icons_layout):   # request to add the method in stub
-        # clear all buttons
-        while self.icons_layout.count():
-            child = self.icons_layout.takeAt(0)
+    def clear_icons_layout(self, icons_layout):
+        # clear all icons_filename_buttons
+        while icons_layout.count():
+            child = icons_layout.takeAt(0)
             if child.widget():
                 child.widget().deleteLater()
-        # file buttons
-        self.column_index = 0
-        self.row_index = 0
+        # file icons_filename_buttons
+        self.icons_column_index = 0
+        self.icons_row_index = 0
 
     def update_grid_positions(self):
-        self.column_index += 1
-        if self.column_index == 2:  # go to next row
-            self.row_index += 1
-            self.column_index = 0
+        self.icons_column_index += 1
+        if self.icons_column_index == 2:  # go to next row
+            self.icons_row_index += 1
+            self.icons_column_index = 0
 
-    def set_button_style(self, button, icon_path):
+    def set_button_style(self, button):
         button.setFixedSize(250, 25)
         # button.setIcon(QtGui.QIcon(icon_path))
-
         button.setStyleSheet("""QPushButton {text-align:left; background-color: none; border: none; }
         QPushButton:hover { background-color: #CBE1F5 }
         QPushButton:pressed {  border-width: 5px; background-color: #B7D9F9 }""")
 
 
     def setup_list_view(self):
-        self.stacked_pages.setCurrentWidget(self.list_widget)
+        self.stacked_pages.setCurrentWidget(self.details_widget)
 
 
     def setup_icons_view(self):
         self.stacked_pages.setCurrentWidget(self.icons_widget)
+
+    def process_details_view(self, file_name, file_path):
+        if self.details_row_index == 0:
+            self.details_widget.setRowCount(self.details_row_index)
+            self.details_widget.setColumnCount(len(self.details_header_list))
+            self.details_widget.setHorizontalHeaderLabels(self.details_header_list)
+
+        full_path = file_path + "\\" + file_name
+        self.details_widget.insertRow(self.details_widget.rowCount())
+
+        # column : filename button
+        button = self.create_details_filename_buttons(file_name, full_path)
+        self.details_widget.setCellWidget(self.details_widget.rowCount()-1, 0, button)
+
+        # column : date and time modified
+        date_modified = time.ctime(os.path.getmtime(full_path))                           # request this from data model
+        self.details_widget.setItem(self.details_widget.rowCount()-1, 1, QtWidgets.QTableWidgetItem(str(date_modified)))
+
+        # column : file type
+        file_type = os.path.splitext(full_path)[1].strip('.').upper() + " File"           # request this from data model
+        self.details_widget.setItem(self.details_widget.rowCount()-1, 2, QtWidgets.QTableWidgetItem(file_type))
+
+        # column : size
+        file_size = self.size_in_str(os.stat(full_path).st_size)                          # request this from data model
+        self.details_widget.setItem(self.details_widget.rowCount() - 1, 3, QtWidgets.QTableWidgetItem(file_size))
+
+        self.details_widget.setRowHeight(self.details_widget.rowCount() - 1, 25)
+        self.add_icon_to_button(button, full_path)
+        self.details_row_index += 1
+
+        self.details_table_style()
+
+    def details_table_style(self):
+        self.details_widget.setShowGrid(False)
+        self.details_widget.verticalHeader().setVisible(False)
+        self.details_widget.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)  # Todo: Make filenames editable
+        self.details_widget.resizeColumnsToContents()
+
+    def create_details_filename_buttons(self, button_name, file_path):
+        button = QtWidgets.QPushButton(button_name)
+        button.clicked.connect(partial(self.on_item_clicked, file_path))
+        self.set_button_style(button)
+        return button
+
+
 
 
 
