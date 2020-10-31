@@ -157,7 +157,7 @@ class InfoView(QtWidgets.QWidget):
         if " " in file_path:
             print("Cannot process file names with spaces, yet.")
             return
-        if isfile(file_name):
+        if isfile(file_path):
             system("start " + file_path)
         else:
             print("found directory", file_name)
