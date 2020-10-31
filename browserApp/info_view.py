@@ -13,6 +13,7 @@ import time
 from os import listdir, system, path, stat
 from os.path import isfile, join
 from functools import partial
+import model.file
 
 
 class InfoView(QtWidgets.QWidget):
@@ -63,7 +64,6 @@ class InfoView(QtWidgets.QWidget):
 
     def populate(self, data):
         self.data = data
-
         meta = data.get_info()
         print("Meta: ", meta)
         if 'full_path' in meta:
@@ -82,11 +82,6 @@ class InfoView(QtWidgets.QWidget):
             # File:
             if meta['type'] == 'File':          # If we remove files from the collection view, we can delete this check.
                 pass
-                # self.process_details_view(item_path, item_path)
-                # self.process_icons_view(item_path, item_path)
-                #
-                # self.clear_icons_layout(self.icons_layout)
-                # self.icons_layout.setAlignment(QtCore.Qt.AlignTop)
 
             # Directory:
             elif meta['type'] == 'Dir':
@@ -102,14 +97,7 @@ class InfoView(QtWidgets.QWidget):
                     else:
                         directories.append(item)
 
-                print("Files: ", files, "Folders:", directories)
-
-                # process files
                 self.reset_row_column_counts()
-                # for file in files:
-                #     print("file: ", file)
-                #     self.process_details_view(file, item_path)
-                #     self.process_icons_view(file, item_path)
 
                 for item in files_and_folders:
                     self.process_details_view(item, item_path)
@@ -152,7 +140,7 @@ class InfoView(QtWidgets.QWidget):
         icon = icon_provider.icon(file_info)
         button.setIcon(icon)
 
-    def on_item_clicked(self, file_name, file_path):                    # ?? Does not work if there are any spaces in the file name
+    def on_item_clicked(self, file_name, file_path):      # Todo: Does not work if there are any spaces in the file name
         print("Opening", file_path, "...")
         if " " in file_path:
             print("Cannot process file names with spaces, yet.")
@@ -160,8 +148,11 @@ class InfoView(QtWidgets.QWidget):
         if isfile(file_path):
             system("start " + file_path)
         else:
-            print("found directory", file_name)
-
+            # if it's a folder, clear layouts, and populate with data inside that folder
+            self.clear_details_widget(self.details_widget)
+            self.clear_icons_layout(self.icons_layout)
+            file_item_object = model.file.FileItem(file_path)  # create object of model.file > FileItem to generate data
+            self.populate(file_item_object)
 
     def size_in_str(self, size_float):
         if size_float < 1000:
@@ -207,33 +198,33 @@ class InfoView(QtWidgets.QWidget):
     def setup_icons_view(self):
         self.stacked_pages.setCurrentWidget(self.icons_widget)
 
-    def process_details_view(self, file_name, file_path):
+    def process_details_view(self, file_name, folder_path):
         if self.details_row_index == 0:
             self.details_widget.setRowCount(self.details_row_index)
             self.details_widget.setColumnCount(len(self.details_header_list))
             self.details_widget.setHorizontalHeaderLabels(self.details_header_list)
 
-        full_path = file_path + "\\" + file_name
+        file_path = str(join(folder_path, file_name))
         self.details_widget.insertRow(self.details_widget.rowCount())
 
         # column : filename button
-        button = self.create_details_filename_buttons(file_name, file_name, full_path)
+        button = self.create_details_filename_buttons(file_name, file_name, file_path)
         self.details_widget.setCellWidget(self.details_widget.rowCount()-1, 0, button)
 
         # column : date and time modified
-        date_modified = time.ctime(path.getmtime(full_path))                           # request this from data model
+        date_modified = time.ctime(path.getmtime(file_path))                           # request this from data model
         self.details_widget.setItem(self.details_widget.rowCount()-1, 1, QtWidgets.QTableWidgetItem(str(date_modified)))
 
         # column : file type
-        file_type = path.splitext(full_path)[1].strip('.').upper() + " File"           # request this from data model
+        file_type = path.splitext(file_path)[1].strip('.').upper() + " File"           # request this from data model
         self.details_widget.setItem(self.details_widget.rowCount()-1, 2, QtWidgets.QTableWidgetItem(file_type))
 
         # column : size
-        file_size = self.size_in_str(stat(full_path).st_size)                          # request this from data model
+        file_size = self.size_in_str(stat(file_path).st_size)                          # request this from data model
         self.details_widget.setItem(self.details_widget.rowCount() - 1, 3, QtWidgets.QTableWidgetItem(file_size))
 
         self.details_widget.setRowHeight(self.details_widget.rowCount() - 1, 25)
-        self.add_icon_to_button(button, full_path)
+        self.add_icon_to_button(button, file_path)
         self.details_row_index += 1
 
         self.details_table_style()
