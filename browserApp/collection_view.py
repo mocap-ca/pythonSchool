@@ -10,38 +10,18 @@ class CollectionView(QtWidgets.QWidget):
     def __init__(self, parent=None):
         super(CollectionView, self).__init__(parent)
 
-        layout = QtWidgets.QHBoxLayout()
-
-        #self.label = QtWidgets.QLabel()
-        self.labels = []
-
-        layout.addSpacing(1)
-        #layout.addWidget(self.label)
-        layout.addSpacing(1)
-
-        self.setLayout(layout)
+        self.layout = QtWidgets.QHBoxLayout()
+        self.hide()
+        self.setLayout(self.layout)
 
     def populate(self, items):
-        #self.label.clear()
-        for label in self.labels:
-            label.clear()
-            self.layout().removeWidget(label)
-        self.labels.clear()
-
+        self.clear()
         child_count = items.children()
         if child_count == 0:
+            self.hide()
             return
 
-        # file_size = 0
-        #
-        # for i in range(child_count):
-        #     subitem = items.get_child(i)
-        #     meta = subitem.get_info()
-        #
-        #     if "file_size" in meta:
-        #         file_size += meta["file_size"]
-        #
-        # self.label.setText("Total Size: %d" % file_size)
+        self.show()
 
         keys = set()
         integer_values = {}
@@ -65,11 +45,18 @@ class CollectionView(QtWidgets.QWidget):
                     integer_values[key] += value
 
         for key, value in integer_values.items():
+            print(str(key) + str(value))
             label = QtWidgets.QLabel("Total {}: {}".format(key, value))
-            self.labels.append(label)
-            self.layout().addWidget(label)
+            self.layout.addWidget(label)
 
-        print(integer_values)
+    def clear(self):
+        while self.layout.count():
+            item = self.layout.takeAt(0)
+            widget = item.widget()
+            if widget is not None:
+                widget.deleteLater()
+            else:
+                self.clear()
 
 
 

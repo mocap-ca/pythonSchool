@@ -8,6 +8,9 @@ except:
     create_signal = QtCore.pyqtSignal
 
 from browserApp.model import base
+from browserApp.model import file
+
+from subprocess import Popen
 
 
 class TreeBrowser(QtWidgets.QTreeWidget):
@@ -22,15 +25,19 @@ class TreeBrowser(QtWidgets.QTreeWidget):
         self.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.customContextMenuRequested.connect(self.show_menu)
 
-    def show_menu(self, p):
-
+    def show_menu(self, point):
         menu = QtWidgets.QMenu(self)
-        action = menu.addAction("TEST")
-        action.triggered.connect(self.do_this)
-        menu.popup(self.mapToGlobal(p))
 
-    def do_this(self):
-        print("I'll get right on that!!!")
+        item_at_point = self.itemAt(point)
+
+        if item_at_point:
+            if type(item_at_point.data(0, QtCore.Qt.UserRole)) == file.FileItem:
+                open_location_action = menu.addAction("Open file location")
+                open_location_action.triggered.connect(lambda checked: self.open_location(item_at_point))
+                copy_path_action = menu.addAction("Copy path to clipboard")
+                copy_path_action.triggered.connect(lambda checked: self.copy_path(item_at_point))
+
+        menu.popup(self.mapToGlobal(point))
 
     def populate(self, top_item):
         self.clear()
@@ -79,3 +86,16 @@ class TreeBrowser(QtWidgets.QTreeWidget):
             icon = None
         item.setIcon(0, QtGui.QIcon(icon))
 
+    def open_location(self, item):
+        data = item.data(0, QtCore.Qt.UserRole)
+        info = data.get_info()
+        path = info["full_path"].replace("/", "\\")
+        Popen(r'explorer /select,"{}"'.format(path))
+
+    def copy_path(self, item):
+        data = item.data(0, QtCore.Qt.UserRole)
+        info = data.get_info()
+        path = info["full_path"]
+        clipboard = QtWidgets.QApplication.clipboard()
+        clipboard.clear(mode=clipboard.Clipboard)
+        clipboard.setText(path, mode=clipboard.Clipboard)

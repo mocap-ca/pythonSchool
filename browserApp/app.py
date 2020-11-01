@@ -30,13 +30,15 @@ class App(QtWidgets.QMainWindow):
         layout = QtWidgets.QHBoxLayout()
 
         # Tree View (on left)
+        tree_layout = QtWidgets.QVBoxLayout()
         self.tree = tree_browser.TreeBrowser()
         self.tree.app_item_selected.connect(self.itemSelected)
-        layout.addWidget(self.tree)
+        tree_layout.addWidget(self.tree)
+        layout.addLayout(tree_layout)
 
         # Collection view (in middle)
         self.collection = collection_view.CollectionView()
-        layout.addWidget(self.collection)
+        tree_layout.addWidget(self.collection)
 
         # Info view (on right)
         self.info = info_view.InfoView()
