@@ -14,6 +14,7 @@ import sys
 import info_view, tree_browser, collection_view
 from model import file as model_file
 
+
 class App(QtWidgets.QMainWindow):
 
     """ This is the foo application, which should work with any kind of model data """

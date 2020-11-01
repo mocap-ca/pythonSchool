@@ -51,7 +51,9 @@ class FileItem(BaseItem):
             data['created'] = str(stat.st_ctime)
 
         if os.path.isdir(self.full_path):
+            # stat = os.stat(self.full_path)
             data['type'] = "Dir"
+            # data['created'] = str(stat.st_ctime)
 
         return data
 
