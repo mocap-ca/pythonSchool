@@ -1,7 +1,7 @@
 # from browserApp.model.base import BaseItem
 from model.base import BaseItem
 import os
-
+from datetime import datetime
 
 class FileItem(BaseItem):
     def __init__(self, full_path):
@@ -47,8 +47,15 @@ class FileItem(BaseItem):
         if os.path.isfile(self.full_path):
             stat = os.stat(self.full_path)
             data['type'] = "File"
-            data['file_size'] = stat.st_size
-            data['created'] = str(stat.st_ctime)
+            
+            # data['file_ext'] = # Retrieve file ext
+            data['file_size'] = str(stat.st_size) + " bytes"
+            data['created'] = datetime.fromtimestamp(stat.st_ctime).strftime('%Y-%b-%d %H:%M')
+            data['modified'] = datetime.fromtimestamp(stat.st_mtime).strftime('%Y-%b-%d %H:%M')
+            data['device'] = str(stat.st_dev)
+
+
+
 
         if os.path.isdir(self.full_path):
             # stat = os.stat(self.full_path)

@@ -341,20 +341,3 @@ def convert_filesize_to_str(size_long):
         return str(size_long / (10 ** 6)) + " MB"
     else:
         return str(size_long / (10 ** 9)) + " GB"
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
