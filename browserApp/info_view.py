@@ -33,7 +33,7 @@ class InfoView(QtWidgets.QWidget):
         # Update the table with name : value from the get_info() dict
         meta = data.get_info()
         for k, v in meta.items():
-            item = QtWidgets.QTreeWidgetItem([k,v])
+            item = QtWidgets.QTreeWidgetItem([str(k),str(v)])
             self.table.addTopLevelItem(item)
 
 
