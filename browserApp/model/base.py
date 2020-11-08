@@ -26,3 +26,11 @@ class BaseItem(object):
         """ returns a dict of information about the item """
         return NotImplementedError
 
+    def actions(self):
+        """ returns a list of actions that can be performed """
+        return NotImplementedError
+
+    def perform_action(self, name):
+        """ perform an action """
+        return NotImplementedError
+

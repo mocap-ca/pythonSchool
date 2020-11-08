@@ -12,6 +12,8 @@ from browserApp.model import file
 
 from subprocess import Popen
 
+from functools import partial
+
 
 class TreeBrowser(QtWidgets.QTreeWidget):
 
@@ -31,11 +33,16 @@ class TreeBrowser(QtWidgets.QTreeWidget):
         item_at_point = self.itemAt(point)
 
         if item_at_point:
-            if type(item_at_point.data(0, QtCore.Qt.UserRole)) == file.FileItem:
-                open_location_action = menu.addAction("Open file location")
-                open_location_action.triggered.connect(lambda checked: self.open_location(item_at_point))
-                copy_path_action = menu.addAction("Copy path to clipboard")
-                copy_path_action.triggered.connect(lambda checked: self.copy_path(item_at_point))
+            item = item_at_point.data(0, QtCore.Qt.UserRole)
+            if isinstance(item, file.FileItem):
+                for name in item.actions():
+                    action = menu.addAction(name)
+                    action.triggered.connect(partial(item.perform_action, name))
+
+                #open_location_action = menu.addAction("Open file location")
+                #open_location_action.triggered.connect(lambda checked: self.open_location(item_at_point))
+                #copy_path_action = menu.addAction("Copy path to clipboard")
+                #copy_path_action.triggered.connect(lambda checked: self.copy_path(item_at_point))
 
         menu.popup(self.mapToGlobal(point))
 

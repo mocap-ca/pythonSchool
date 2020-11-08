@@ -61,5 +61,17 @@ class FileItem(BaseItem):
 
         return data
 
+    def actions(self):
+        return ['Open file location', 'Copy Path to Clipboard']
+
+    def perform_action(self, action):
+        if action == 'Open file location':
+            print("open file location for: "+ str(self))
+
+        if action == 'Copy Path to Clipboard':
+            print("copy path to cb for: " + str(self))
+
+
+
 
 
