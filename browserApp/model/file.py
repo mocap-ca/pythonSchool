@@ -38,6 +38,10 @@ class FileItem(BaseItem):
 
         return FileItem(os.path.join(self.full_path, self.file_list[n]))
 
+    def format_time(self, time_value):
+        '''Function for formating time'''
+        return datetime.fromtimestamp(time_value).strftime('%Y-%b-%d %H:%M')
+
     def get_info(self):
         data = {
             'full_path': self.full_path,
@@ -45,11 +49,12 @@ class FileItem(BaseItem):
 
         if os.path.isfile(self.full_path):
             stat = os.stat(self.full_path)
+            print(stat.st_ctime)
             data['Type'] = os.path.splitext(self.full_path)[1] # Get extension from filename
-            #data['file_name: '] = # Get filename
+            data['file_name: '] = os.path.splitext(self.full_path)[0] # Get filename
             data['file_size'] = os.path.getsize(self.full_path) # store the file size in "12.23MB" format
-            data['created'] = datetime.fromtimestamp(stat.st_ctime).strftime('%Y-%b-%d %H:%M')
-            data['modified'] = datetime.fromtimestamp(stat.st_mtime).strftime('%Y-%b-%d %H:%M')
+            data['created'] = self.format_time(stat.st_ctime)
+            data['modified'] = self.format_time(stat.st_mtime)
             #data['device'] = str(stat.st_dev)
 
 
