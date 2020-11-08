@@ -415,6 +415,7 @@ def convert_filesize_to_str(size_long):
         return str(size_long / (10 ** 6)) + " MB"
     else:
         return str(size_long / (10 ** 9)) + " GB"
+<<<<<<< HEAD
 
 
 # class QDoublePushButton(QtWidgets.QPushButton):
@@ -451,3 +452,5 @@ def convert_filesize_to_str(size_long):
 
 
 
+=======
+>>>>>>> 5e265c6a0a16da617ceec3325b3f2be58c5117b2
