@@ -40,8 +40,8 @@ class App(QtWidgets.QMainWindow):
         layout.addWidget(self.collection)
 
         # Info view (on right)
-        self.info = info_view.InfoView()
-        layout.addWidget(self.info)
+        # self.info = info_view.InfoView()
+        # layout.addWidget(self.info)
 
         self.main_widget.setLayout(layout)
 
@@ -53,7 +53,7 @@ class App(QtWidgets.QMainWindow):
 
     def itemSelected(self, model_info):
         """ User as clicked on an item in the tree, pass item's data to the info view """
-        self.info.populate(model_info)
+        # self.info.populate(model_info)
         self.collection.populate(model_info)
 
 
