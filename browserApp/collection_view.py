@@ -88,7 +88,7 @@ class CollectionView(QtWidgets.QWidget):
         :param file_path: full path to the file or folder button that is clicked on.
         :type file_path: str"""
         if isfile(file_path):
-            self.info.populate(file_path)
+            self.info.display_info(file_path)
         else:
             print("Not handled folders yet. App is still under construction.")
 
