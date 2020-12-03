@@ -8,6 +8,7 @@ except:
 from os import path, system, remove, listdir
 from os.path import isfile, join
 import model
+# from os import listdir, system, path, remove, rename
 from functools import partial
 import info_view
 
@@ -19,19 +20,21 @@ class CollectionView(QtWidgets.QWidget):
         layout = QtWidgets.QHBoxLayout()
         self.setLayout(layout)
 
-        self.icons_widget = QtWidgets.QWidget()
-        self.icons_layout = QtWidgets.QGridLayout()
+        self.icons_table_widget = QtWidgets.QTableWidget()
+        self.icons_table_widget.cellClicked.connect(self.on_item_clicked)
+        self.icons_table_widget.cellDoubleClicked.connect(self.open_item)
+
         self.icon_image_path = "/images/folder_icon.png"
         self.icons_column_index = 0
         self.icons_row_index = 0
         self.NUMBER_OF_GRID_COLUMNS = 1
         self.data = None
+        self.item_paths = []
 
-        self.info = info_view.InfoView()
+        self.info_obj = info_view.InfoView()
 
-        layout.addWidget(self.icons_widget)
-        layout.addWidget(self.info)
-        # self.icons_filename_buttons = {}
+        layout.addWidget(self.icons_table_widget)
+        layout.addWidget(self.info_obj)
 
     def populate(self, data):
         """ Populates the Display area of the window with a stacked widget. The stacked widgets contains two pages:
@@ -43,14 +46,15 @@ class CollectionView(QtWidgets.QWidget):
                 :type data: object of file.FileItem  """
         self.data = data
         meta = data.get_info()
-        print("Meta: ", meta)
         if 'full_path' not in meta:
             print("Could not find file path in dictionary")
             return
         item_path = meta['full_path']
 
         # Clear Icons View:
-        clear_grid_layout(self.icons_layout)
+        self.icons_table_widget.clearContents()
+        self.item_paths = []
+        # clear_grid_layout(self.icons_layout)
         self.reset_row_column_counts()
         # self.add_view_options_buttons(self.icons_layout)
 
@@ -63,11 +67,9 @@ class CollectionView(QtWidgets.QWidget):
             return
 
         # Directory:
-        self.icons_layout.setAlignment(QtCore.Qt.AlignTop)
         list_of_files = []
         list_of_folders = []
         list_of_files_and_folders = listdir(item_path)
-        print(list_of_files_and_folders)
         for item in list_of_files_and_folders:
             if path.isfile(path.join(item_path, item)):  # Request addition of 'file_name' to data model.
                 list_of_files.append(item)
@@ -76,19 +78,29 @@ class CollectionView(QtWidgets.QWidget):
 
         self.reset_row_column_counts()
 
-        self.icons_widget.setLayout(self.icons_layout)
-        self.icons_layout.setSpacing(0)  # sets spacing between widgets in the layout to 0.
+        self.icons_table_widget.setRowCount(0)
+        self.icons_table_widget.setColumnCount(0)
+        self.icons_table_widget.insertColumn(0)
+        self.icons_table_widget.horizontalHeader().setVisible(False)
 
         for item in list_of_files_and_folders:
-            self.add_item_to_iconview(item, item_path)
+            # insert a row
+            row_pos = self.icons_table_widget.rowCount()
+            self.icons_table_widget.insertRow(row_pos)
 
-    def on_item_clicked(self, file_path):      # Todo: Does not work if there are any spaces in the file name
+            self.add_item_to_iconview(item, item_path)
+            self.item_paths.append(item_path + "\\" + item)
+
+
+    def on_item_clicked(self, row):      # Todo: Does not work if there are any spaces in the file name
         """If user clicks on a file, opens it. If user clicks on a folder, clears the display and repopulates it with
         contents of the folder that is clicked on.
         :param file_path: full path to the file or folder button that is clicked on.
         :type file_path: str"""
+        file_path = self.item_paths[row]
+
         if isfile(file_path):
-            self.info.display_info(file_path)
+            self.info_obj.display_info(file_path)
         else:
             print("Not handled folders yet. App is still under construction.")
 
@@ -134,12 +146,13 @@ class CollectionView(QtWidgets.QWidget):
         """ Refreshes the view. """
         pass                                                                                       # Todo
 
-    def open_item(self, button):
+    def open_item(self, clicked_row):
         """ Opens the selected file.
-        :param button: button user clicks on.
-        :type button: QPushButton
+        :param clicked_row: row index of the cell in the table widget that the user clicks on
+        :type clicked_row: int
         """
-        file_path = self.buttons_dictionary[button]
+        file_path = self.item_paths[clicked_row]
+        # file_path = self.buttons_dictionary[button]
         if path.exists(file_path):
             print("Opening", file_path + "...")
             if " " in file_path:
@@ -149,7 +162,8 @@ class CollectionView(QtWidgets.QWidget):
                 system("start " + file_path)
             else:
                 # if it's a folder, clear both pages, and populate with data inside that folder
-                clear_grid_layout(self.icons_layout)
+                # clear_grid_layout(self.icons_layout)
+                self.icons_table_widget.clearContents()
                 file_item_object = model.file.FileItem(
                     file_path)  # to generate data, create object of model.file FileItem
                 self.populate(file_item_object)
@@ -174,18 +188,26 @@ class CollectionView(QtWidgets.QWidget):
         :type file_path: str """
 
         file_name = file.split('.')[0]                                                          # removes the extension.
-        button = QtWidgets.QPushButton(file_name)
-        set_button_style(button)
 
         if "." not in file_path:                   # Todo: use a different method. What if the file name contains a dot?
             full_path = join(file_path, file)
         else:
             full_path = file_path
-        add_icon_to_button(button, full_path)
-        button.clicked.connect(partial(self.on_item_clicked, full_path))
+        # add_icon_to_button(button, full_path)
+        # button.clicked.connect(partial(self.on_item_clicked, full_path))
 
-        self.icons_layout.addWidget(button, self.icons_row_index, self.icons_column_index)
+        cell_widget = TableCellWidget()
+        cell_widget.create_widget(file_name, full_path)
+
+        self.icons_table_widget.setCellWidget(self.icons_table_widget.rowCount()-1, 0, cell_widget)
+        # self.icons_layout.addWidget(button, self.icons_row_index, self.icons_column_index)
         self.increment_grid_position()
+        self.set_table_style()
+
+    def set_table_style(self):
+        self.icons_table_widget.setColumnWidth(0, 200)
+        self.icons_table_widget.verticalHeader().setVisible(False)
+        self.icons_table_widget.setShowGrid(False)
 
 
 def clear_grid_layout(grid_layout):
@@ -199,80 +221,47 @@ def clear_grid_layout(grid_layout):
         if child.widget():
             child.widget().deleteLater()
 
-
-def set_button_style(button):
-    """ Sets the button style and dimensions. No background or border by default. Turns blue with a border on hover.
-    :param button: the buttons with the file name and icon on them.
-    :type button: QWidgets.QPushButton """
-    button.setFixedSize(250, 25)
-    button.setStyleSheet(""" QPushButton {text-align:left; background-color: none; border: none; }
-                             QPushButton:hover { background-color: #CBE1F5 }
-                             QPushButton:pressed {  border-width: 5px; background-color: #B7D9F9 } """)
-
-
-def add_icon_to_button(button, file_path):
-    """Adds an icon to the button that is the windows standard icon associated with that file.
-    :param button: button to which the icon is to be added
-    :type button: QPushButton
-    :param file_path: full path to the file whose icon is to be added to the button
-    :type file_path: str"""
-    file_info = QtCore.QFileInfo(file_path)
-    icon_provider = QtWidgets.QFileIconProvider()
-    icon = icon_provider.icon(file_info)
-    button.setIcon(icon)
+# def set_button_style(button):
+#     """ Sets the button style and dimensions. No background or border by default. Turns blue with a border on hover.
+#     :param button: the buttons with the file name and icon on them.
+#     :type button: QWidgets.QPushButton """
+#     button.setFixedSize(250, 25)
+#     button.setStyleSheet(""" QPushButton {text-align:left; background-color: none; border: none; }
+#                              QPushButton:hover { background-color: #CBE1F5 }
+#                              QPushButton:pressed {  border-width: 5px; background-color: #B7D9F9 } """)
 
 
+class TableCellWidget(QtWidgets.QWidget):
+    """Class to create a layout with a label and an icon. Useful for creating file buttons in a QTableWidget
+    for a file browser."""
+    def __init__(self, parent=None):
+        super(TableCellWidget, self).__init__(parent)
 
+        self.layout = QtWidgets.QHBoxLayout()
 
+        # adjust spacings between the icon and the text
+        self.layout.setContentsMargins(0, 0, 0, 0)
 
+        self.icon_label = QtWidgets.QLabel()
+        self.text_label = QtWidgets.QLabel()
+        self.layout.setAlignment(QtCore.Qt.AlignLeft)
+        self.setLayout(self.layout)
 
+    def create_widget(self, file_name, file_path):
+        self.create_icon(file_path)
+        self.layout.addWidget(self.icon_label)
+        self.text_label.setText(file_name)
+        self.layout.addWidget(self.text_label)
 
-        # self.label.clear()
-        # for label in self.labels:
-        #     label.clear()
-        #     self.layout().removeWidget(label)
-        # # self.labels.clear()
-        #
-        # child_count = items.children()
-        # if child_count == 0:
-        #     return
-        #
-        # file_size = 0
-        #
-        # for i in range(child_count):
-        #     subitem = items.get_child(i)
-        #     meta = subitem.get_info()
-        #
-        #     if "file_size" in meta:
-        #         file_size += meta["file_size"]
-        #
-        # self.label.setText("Total Size: %d" % file_size)
-        #
-        # keys = set()
-        # integer_values = {}
-        #
-        # # Get keys
-        # for i in range(child_count):
-        #     subitem = items.get_child(i)
-        #     meta = subitem.get_info()
-        #     keys.update(meta.keys())
-        #
-        # # Get cumulative key values
-        # for i in range(child_count):
-        #     subitem = items.get_child(i)
-        #     meta = subitem.get_info()
-        #
-        #     for key in [x for x in keys if x in meta]:
-        #         value = meta[key]
-        #         if isinstance(value, int):
-        #             if key not in integer_values:
-        #                 integer_values[key] = 0
-        #             integer_values[key] += value
-        #
-        #
-        # print(integer_values)
-
-
+    def create_icon(self, file_path):
+        """
+        :param file_path: full path to the file whose icon is to be added to the button
+        :type file_path: str"""
+        file_info = QtCore.QFileInfo(file_path)
+        icon_provider = QtWidgets.QFileIconProvider()
+        icon = icon_provider.icon(file_info)
+        pic = icon.pixmap(10, 10)
+        self.icon_label.setPixmap(pic)
 
 
 

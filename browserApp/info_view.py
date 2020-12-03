@@ -14,18 +14,17 @@ Assumptions made: file and folder names doe not contain spaces or dots. Only one
 10. Add LMB click options.
 """
 
+from os import path
+import model.file
+
 try:
     from PySide2 import QtWidgets, QtCore, QtGui
+
     create_signal = QtCore.Signal
 except:
     from PyQt5 import QtWidgets, QtCore, QtGui
-    create_signal = QtCore.pyqtSignal
 
-import datetime
-from os import listdir, system, path, remove, rename
-from os.path import isfile, join
-from functools import partial
-import model.file
+    create_signal = QtCore.pyqtSignal
 
 
 class InfoView(QtWidgets.QWidget):
@@ -44,11 +43,10 @@ class InfoView(QtWidgets.QWidget):
         self.file_path = ""
         self.data = None
 
-        self.details_header_list = ["Name", "Created", "Modified", "Type", "Size"]    # Is this a string constant list??
+        self.details_header_list = ["Name", "Created", "Modified", "Type", "Size"]  # Is this a string constant list??
         self.details_row_index = 0
         self.details_column_index = 0
 
-        # self.file_name_label = QtWidgets.QLabel("")
         self.setLayout(layout)
         self.setMinimumWidth(200)
 
@@ -70,7 +68,7 @@ class InfoView(QtWidgets.QWidget):
         self.details_row_index = 1
         self.details_column_index = 1
         self.details_widget.rowCount = 1
-        print("indexes", self.details_row_index, self.details_column_index)
+        # print("indexes", self.details_row_index, self.details_column_index)
 
     def populate_info_table(self, file_path):
         """ Populates the details table widget with data.
@@ -120,7 +118,6 @@ class InfoView(QtWidgets.QWidget):
 
         self.details_table_style()
 
-
     def details_table_style(self):
         """Sets the style for the details table widget."""
 
@@ -134,7 +131,7 @@ class InfoView(QtWidgets.QWidget):
                                           "QHeaderView {background-color: transparent;"
                                           "border-right: 1px solid gray;}"
                                           "QTableCornerButton::section {background-color: transparent;}")
-        self.details_widget.horizontalHeader().setDefaultAlignment(QtCore.Qt.AlignLeft)         # left align header text
+        self.details_widget.horizontalHeader().setDefaultAlignment(QtCore.Qt.AlignLeft)  # left align header text
 
     def clear_grid_layout(grid_layout):
         """ Deletes all the contents of a grid layout.
@@ -155,7 +152,7 @@ def create_table_widget_header(widget, header_items):
      :param header_items: List of headings for the table's columns
      :rtype header_items: list of strings
      """
-    widget.setColumnCount(2)                                                    # ?? Re-think this.
+    widget.setColumnCount(2)  # ?? Re-think this.
     widget.setRowCount(len(header_items))
     widget.setVerticalHeaderLabels(header_items)
 
@@ -166,7 +163,6 @@ def clear_table_widget(table):
     :type table: QtWidgets.QTableWidget
     """
     table.clearContents()
-    print("cleared table contents")
 
 
 def set_button_style(button):
@@ -194,78 +190,3 @@ def convert_filesize_to_str(size_long):
         return str(size_long / (10 ** 6)) + " MB"
     else:
         return str(size_long / (10 ** 9)) + " GB"
-
-    # def switch_page(self, selected_widget):
-    #     """Switches current widget in the stack over to the selected widget.
-    #     This method has been created in case I need to change the functionality such that the buttons for a view are
-    #     created if, and only when, that view is selected.
-    #     :param selected_widget: The widget from the stack that needs to be set as the current widget.
-    #     :type selected_widget: QtWidget """
-    #     self.stacked_pages.setCurrentWidget(selected_widget)
-
-    # def create_details_filename_buttons(self, button_name, file_path):
-    #     """ Creates a button, and makes signal-slot connections for it.
-    #     :param button_name: name of the button.
-    #     :type button_name: str
-    #     :param file_path: full path to the file that is to be listed on the button.
-    #     :type file_path: str
-    #     :return button: button with the file name on it.
-    #     :rtype button: QPushButton widget
-    #     """
-    #     button = QtWidgets.QPushButton(button_name)
-    #     button.clicked.connect(partial(self.on_item_clicked, file_path))
-    #     set_button_style(button)
-    #
-    #     if not isfile(file_path):
-    #         return button
-    #     # set button context menu policy
-    #     button.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
-    #     button.customContextMenuRequested.connect(partial(self.show_rightclick_menu, button))
-    #     self.buttons_dictionary[button] = file_path
-    #
-    #     return button
-    #
-
-    # def rename_item(self, button):
-    #     file_path = self.buttons_dictionary[button]
-    #
-    #     new_file_path = "some new name"
-    #     if path.exists(file_path):
-    #         rename(file_path, new_file_path)
-
-    # def on_item_clicked(self, file_path):      # Todo: Does not work if there are any spaces in the file name
-    #     """If user clicks on a file, opens it. If user clicks on a folder, clears the display and repopulates it with
-    #     contents of the folder that is clicked on.
-    #     :param file_path: full path to the file or folder button that is clicked on.
-    #     :type file_path: str"""
-    #
-    #     print("Opening", file_path + "...")
-    #     if " " in file_path:
-    #         print("Cannot process file names with spaces, yet.")
-    #         return
-    #     if isfile(file_path):
-    #         system("start " + file_path)
-    #     else:
-    #         # if it's a folder, clear both pages, and display_info with data inside that folder
-    #         self.clear_table_widget(self.details_widget)
-    #         file_item_object = model.file.FileItem(file_path) # to generate data, create object of model.file FileItem
-    #         self.display_info(file_item_object)
-    #
-    # def on_item_clicked(self, file_path):  # Todo: Does not work if there are any spaces in the file name
-    #     """If user clicks on a file, opens it. If user clicks on a folder, clears the display and repopulates it with
-    #     contents of the folder that is clicked on.
-    #     :param file_path: full path to the file or folder button that is clicked on.
-    #     :type file_path: str"""
-    #
-    #     print("Opening", file_path + "...")
-    #     if " " in file_path:
-    #         print("Cannot process file names with spaces, yet.")
-    #         return
-    #     if path.isfile(file_path):
-    #         system("start " + file_path)
-    #     else:
-    #         # if it's a folder, clear both pages, and display_info with data inside that folder
-    #         self.clear_table_widget(self.details_widget)
-    #         file_item_object = model.file.FileItem(file_path)
-    # # to generate data, create object of model.file FileItem
-    #         self.display_info(file_item_object)
