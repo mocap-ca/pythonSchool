@@ -51,12 +51,9 @@ class InfoView(QtWidgets.QWidget):
         self.setMinimumWidth(200)
 
     def display_info(self, file_path):
-        """ Populates the Display area of the window with a stacked widget. The stacked widgets contains two pages:
-                the Icons View page which shows the contents of the folder as a grid of buttons, and
-                the Details View page which shows a table of files(buttons) and their details, eg., file size, date modified.
-                Todo: Get file details from meta
-                :param file_path: full path of the file
-                :type file_path: str  """
+        """ Populates Info View area of the app with details such as file name, extension, size, date created, etc.
+        :param file_path: full path of the file
+        :type file_path: str  """
         clear_table_widget(self.details_widget)
 
         self.file_path = file_path
@@ -68,29 +65,25 @@ class InfoView(QtWidgets.QWidget):
         self.details_row_index = 1
         self.details_column_index = 1
         self.details_widget.rowCount = 1
-        # print("indexes", self.details_row_index, self.details_column_index)
 
     def populate_info_table(self, file_path):
         """ Populates the details table widget with data.
         If it is the first time it is being called, sets up the headers.
-        :param file_path: path of the file to be added to the button
+        :param file_path: path to the selected file
         :type file_path: str
         """
         if self.details_row_index == 0:
             create_table_widget_header(self.details_widget, self.details_header_list)
 
-        item_data_object = model.file.FileItem(file_path)
-        item_data = item_data_object.get_info()
         self.details_column_index += 1
 
-        # column : filename
+        # row : filename
         file_name = path.split(file_path)[1]
-        # self.file_name_label.setText(file_name)
         self.details_widget.setItem(0, 1, QtWidgets.QTableWidgetItem(file_name))
         file_item_object = model.file.FileItem(file_path)  # to access details, create object of model.file FileItem
         item_data = file_item_object.get_info()  # get the data dictionary and store in item_data
 
-        # column : date and time created
+        # row : date and time created
         if 'created' in item_data:
             date_created = item_data['created']
             self.details_widget.setItem(1, 1, QtWidgets.QTableWidgetItem(date_created))
@@ -99,7 +92,7 @@ class InfoView(QtWidgets.QWidget):
             date_modified = item_data['modified']
             self.details_widget.setItem(2, 1, QtWidgets.QTableWidgetItem(date_modified))
 
-        # column : file type
+        # row : file type
         file_type = None
         if 'file_type' in item_data:
             file_type = item_data['file_type']
@@ -108,10 +101,11 @@ class InfoView(QtWidgets.QWidget):
         if file_type:
             self.details_widget.setItem(3, 1, QtWidgets.QTableWidgetItem(file_type))
 
-        # column : size
+        # row : size
         if 'file_size' in item_data:
             file_size = item_data['file_size']  # request this for folders from data model
-            if type(file_size) is float:
+            if file_size.isdigit():
+                file_size = float(file_size)
                 file_size = convert_filesize_to_str(file_size)
 
             self.details_widget.setItem(4, 1, QtWidgets.QTableWidgetItem(file_size))
@@ -133,17 +127,6 @@ class InfoView(QtWidgets.QWidget):
                                           "QTableCornerButton::section {background-color: transparent;}")
         self.details_widget.horizontalHeader().setDefaultAlignment(QtCore.Qt.AlignLeft)  # left align header text
 
-    def clear_grid_layout(grid_layout):
-        """ Deletes all the contents of a grid layout.
-        :param grid_layout: The layout the needs to be cleared.
-        :type grid_layout: QtWidgets.QGridLayout """
-
-        # clear all icons_filename_buttons
-        while grid_layout.count():
-            child = grid_layout.takeAt(0)
-            if child.widget():
-                child.widget().deleteLater()
-
 
 def create_table_widget_header(widget, header_items):
     """ Creates the header for a table widget.
@@ -162,17 +145,7 @@ def clear_table_widget(table):
     :param table: table widget that needs to be cleared.
     :type table: QtWidgets.QTableWidget
     """
-    table.clearContents()
-
-
-def set_button_style(button):
-    """ Sets the button style and dimensions. No background or border by default. Turns blue with a border on hover.
-    :param button: the buttons with the file name and icon on them.
-    :type button: QWidgets.QPushButton """
-    button.setFixedSize(250, 25)
-    button.setStyleSheet(""" QPushButton {text-align:left; background-color: none; border: none; }
-                             QPushButton:hover { background-color: #CBE1F5 }
-                             QPushButton:pressed {  border-width: 5px; background-color: #B7D9F9 } """)
+    table.clearContents()   # Might remove this method if not other operations are needed here.
 
 
 def convert_filesize_to_str(size_long):
