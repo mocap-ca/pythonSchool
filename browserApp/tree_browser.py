@@ -7,8 +7,8 @@ except:
     from PyQt5 import QtWidgets, QtCore, QtGui
     create_signal = QtCore.pyqtSignal
 
-from browserApp.model import base
-
+# from browserApp.model import base
+from model import base
 
 class TreeBrowser(QtWidgets.QTreeWidget):
 

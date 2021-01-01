@@ -1,8 +1,0 @@
-{
-  "group": "_grp", 
-  "nurbsCurve": "_crv", 
-  "locator": "_loc", 
-  "light": "_lgt", 
-  "joint": "_jnt", 
-  "mesh": "_geo"
-}

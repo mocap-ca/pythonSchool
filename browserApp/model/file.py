@@ -1,4 +1,5 @@
-from browserApp.model.base import BaseItem
+# from browserApp.model.base import BaseItem
+from model.base import BaseItem
 import os
 from datetime import datetime
 
@@ -57,7 +58,9 @@ class FileItem(BaseItem):
 
 
         if os.path.isdir(self.full_path):
+            # stat = os.stat(self.full_path)
             data['type'] = "Dir"
+            # data['created'] = str(stat.st_ctime)
 
         return data
 

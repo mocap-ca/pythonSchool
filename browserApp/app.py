@@ -9,8 +9,10 @@ except:
 
 import sys
 
-from browserApp import info_view, tree_browser, collection_view
-from browserApp.model import file as model_file
+# from browserApp import info_view, tree_browser, collection_view
+# from browserApp.model import file as model_file
+import info_view, tree_browser, collection_view
+from model import file as model_file
 
 
 class App(QtWidgets.QMainWindow):
@@ -38,8 +40,8 @@ class App(QtWidgets.QMainWindow):
         layout.addWidget(self.collection)
 
         # Info view (on right)
-        self.info = info_view.InfoView()
-        layout.addWidget(self.info)
+        # self.info = info_view.InfoView()
+        # layout.addWidget(self.info)
 
         self.main_widget.setLayout(layout)
 
@@ -49,13 +51,10 @@ class App(QtWidgets.QMainWindow):
 
         self.show()
 
-
     def itemSelected(self, model_info):
         """ User as clicked on an item in the tree, pass item's data to the info view """
-        self.info.populate(model_info)
+        # self.info.populate(model_info)
         self.collection.populate(model_info)
-
-
 
 
 def show_app(top_item):
@@ -65,6 +64,7 @@ def show_app(top_item):
 
 
 if __name__ == "__main__":
-    top_item = model_file.FileItem("/Volumes/T7/GhostKid")
+    # top_item = model_file.FileItem("/Volumes/T7/GhostKid")
+    top_item = model_file.FileItem("D:\Programming\AlsSchool_Backup\class_3")
 
     show_app(top_item)
